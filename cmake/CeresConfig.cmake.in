@@ -208,7 +208,10 @@ list(APPEND EIGEN_INCLUDE_DIR_HINTS @EIGEN_INCLUDE_DIR@)
 # Search quietly to control the timing of the error message if not found. The
 # search should be for an exact match, but for usability reasons do a soft
 # match and reject with an explanation below.
-find_package(Eigen ${CERES_EIGEN_VERSION} QUIET)
+find_package(Eigen CONFIG QUIET)
+if(NOT EIGEN_FOUND)
+  find_package(Eigen ${CERES_EIGEN_VERSION} QUIET)
+endif()
 if (EIGEN_FOUND)
   if (NOT EIGEN_VERSION VERSION_EQUAL CERES_EIGEN_VERSION)
     # CMake's VERSION check in FIND_PACKAGE() will accept any version >= the

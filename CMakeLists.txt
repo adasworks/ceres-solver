@@ -194,7 +194,10 @@ endif (IOS)
 unset(CERES_COMPILE_OPTIONS)
 
 # Eigen.
-find_package(Eigen REQUIRED)
+find_package(Eigen CONFIG QUIET)
+if(NOT EIGEN_FOUND)
+  find_package(Eigen REQUIRED)
+endif()
 if (EIGEN_FOUND)
   if (EIGEN_VERSION VERSION_LESS 3.1.0)
     message(FATAL_ERROR "-- Ceres requires Eigen version >= 3.1.0 in order "
