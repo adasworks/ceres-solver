@@ -124,7 +124,7 @@ endif(NOT MSVC)
 option(EXPORT_BUILD_DIR
   "Export build directory using CMake (enables external use without install)." OFF)
 option(BUILD_TESTING "Enable tests" ON)
-option(BUILD_DOCUMENTATION "Build User's Guide (html)" OFF)
+option(BUILD_DOCUMENTATION "Build User's Guide (html)" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_SHARED_LIBS "Build Ceres as a shared library." OFF)
 if (MSVC)
@@ -257,22 +257,24 @@ else (LAPACK)
   list(APPEND CERES_COMPILE_OPTIONS CERES_NO_LAPACK)
 endif (LAPACK)
 
-# SuiteSparse.
-if (SUITESPARSE AND NOT LAPACK)
-  # If user has disabled LAPACK, but left SUITESPARSE ON, turn it OFF,
-  # LAPACK controls whether Ceres will be linked, directly or indirectly
-  # via SuiteSparse to LAPACK.
-  message("-- Disabling SuiteSparse as use of LAPACK has been disabled, "
-    "turn ON LAPACK to enable (optional) building with SuiteSparse.")
-  update_cache_variable(SUITESPARSE OFF)
-endif (SUITESPARSE AND NOT LAPACK)
+## SuiteSparse.
+#if (SUITESPARSE AND NOT LAPACK)
+#  # If user has disabled LAPACK, but left SUITESPARSE ON, turn it OFF,
+#  # LAPACK controls whether Ceres will be linked, directly or indirectly
+#  # via SuiteSparse to LAPACK.
+#  message("-- Disabling SuiteSparse as use of LAPACK has been disabled, "
+#    "turn ON LAPACK to enable (optional) building with SuiteSparse.")
+#  update_cache_variable(SUITESPARSE OFF)
+#endif (SUITESPARSE AND NOT LAPACK)
 if (SUITESPARSE)
   # By default, if SuiteSparse and all dependencies are found, Ceres is
   # built with SuiteSparse support.
 
   # Check for SuiteSparse and dependencies.
-  find_package(SuiteSparse)
-  if (SUITESPARSE_FOUND)
+  set(SuiteSparse_USE_LAPACK_BLAS ON)
+  find_package(SuiteSparse REQUIRED CONFIG)
+  include(${USE_SuiteSparse})
+  if (SuiteSparse_FOUND)
     # On Ubuntu the system install of SuiteSparse (v3.4.0) up to at least
     # Ubuntu 13.10 cannot be used to link shared libraries.
     if (BUILD_SHARED_LIBS AND
@@ -293,13 +295,13 @@ if (SUITESPARSE)
     # built with SuiteSparse support.
     message("-- Found SuiteSparse ${SUITESPARSE_VERSION}, "
             "building with SuiteSparse.")
-  else (SUITESPARSE_FOUND)
+  else (SuiteSparse_FOUND)
     # Disable use of SuiteSparse if it cannot be found and continue.
     message("-- Did not find all SuiteSparse dependencies, disabling "
       "SuiteSparse support.")
     update_cache_variable(SUITESPARSE OFF)
     list(APPEND CERES_COMPILE_OPTIONS CERES_NO_SUITESPARSE)
-  endif (SUITESPARSE_FOUND)
+  endif (SuiteSparse_FOUND)
 else (SUITESPARSE)
   message("-- Building without SuiteSparse.")
   list(APPEND CERES_COMPILE_OPTIONS CERES_NO_SUITESPARSE)
@@ -379,14 +381,14 @@ if (MINIGLOG)
 else (MINIGLOG)
   # Don't search with REQUIRED so that configuration continues if not found and
   # we can output an error messages explaining MINIGLOG option.
-  find_package(Glog)
-  if (GLOG_FOUND)
+  find_package(glog CONFIG)
+  if (glog_FOUND)
     message("-- Found Google Log header in: ${GLOG_INCLUDE_DIRS}")
-  else (GLOG_FOUND)
+  else (glog_FOUND)
     message(FATAL_ERROR "Can't find Google Log. Please set GLOG_INCLUDE_DIR & "
       "GLOG_LIBRARY or enable MINIGLOG option to use minimal glog "
       "implementation.")
-  endif (GLOG_FOUND)
+  endif (glog_FOUND)
 endif (MINIGLOG)
 
 if (NOT SCHUR_SPECIALIZATIONS)

@@ -130,15 +130,15 @@ else (SCHUR_SPECIALIZATIONS)
 endif (SCHUR_SPECIALIZATIONS)
 
 # Build the list of dependencies for Ceres based on the current configuration.
-if (NOT MINIGLOG AND GLOG_FOUND)
-  list(APPEND CERES_LIBRARY_PUBLIC_DEPENDENCIES ${GLOG_LIBRARIES})
-endif (NOT MINIGLOG AND GLOG_FOUND)
+if (NOT MINIGLOG AND glog_FOUND)
+  list(APPEND CERES_LIBRARY_PUBLIC_DEPENDENCIES "glog::glog")
+endif (NOT MINIGLOG AND glog_FOUND)
 
-if (SUITESPARSE AND SUITESPARSE_FOUND)
+if (SUITESPARSE AND SuiteSparse_FOUND)
   # Define version information for use in Solver::FullReport.
   add_definitions(-DCERES_SUITESPARSE_VERSION="${SUITESPARSE_VERSION}")
-  list(APPEND CERES_LIBRARY_PRIVATE_DEPENDENCIES ${SUITESPARSE_LIBRARIES})
-endif (SUITESPARSE AND SUITESPARSE_FOUND)
+  list(APPEND CERES_LIBRARY_PRIVATE_DEPENDENCIES ${SuiteSparse_LIBRARIES})
+endif (SUITESPARSE AND SuiteSparse_FOUND)
 
 if (CXSPARSE AND CXSPARSE_FOUND)
   # Define version information for use in Solver::FullReport.
@@ -232,7 +232,8 @@ else (BUILD_SHARED_LIBS)
   set(CERES_LIBRARY_DEPENDENCIES
         ${CERES_LIBRARY_PUBLIC_DEPENDENCIES}
         ${CERES_LIBRARY_PRIVATE_DEPENDENCIES})
-  target_link_libraries(ceres ${CERES_LIBRARY_DEPENDENCIES})
+  target_link_libraries(ceres PUBLIC ${CERES_LIBRARY_DEPENDENCIES})
+  message(${CERES_LIBRARY_DEPENDENCIES})
 endif (BUILD_SHARED_LIBS)
 
 install(TARGETS ceres
@@ -265,8 +266,8 @@ if (BUILD_TESTING AND GFLAGS)
     target_link_libraries(gtest ${GFLAGS_LIBRARIES} ceres)
     target_link_libraries(test_util ceres gtest)
   else (MINIGLOG)
-    target_link_libraries(gtest ${GFLAGS_LIBRARIES} ${GLOG_LIBRARIES})
-    target_link_libraries(test_util ceres gtest ${GLOG_LIBRARIES})
+    target_link_libraries(gtest ${GFLAGS_LIBRARIES} glog::glog)
+    target_link_libraries(test_util ceres gtest glog::glog)
   endif (MINIGLOG)
 
   macro (CERES_TEST NAME)
