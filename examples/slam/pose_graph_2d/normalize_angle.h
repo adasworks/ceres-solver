@@ -30,7 +30,8 @@
 
 #ifndef CERES_EXAMPLES_POSE_GRAPH_2D_NORMALIZE_ANGLE_H_
 #define CERES_EXAMPLES_POSE_GRAPH_2D_NORMALIZE_ANGLE_H_
-
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <cmath>
 
 #include "ceres/ceres.h"

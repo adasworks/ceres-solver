@@ -50,7 +50,8 @@
 // A problem is considered solved if of the log relative error of its
 // objective function is at least 4.
 
-
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <cmath>
 #include <iostream>  // NOLINT
 #include <sstream>   // NOLINT
