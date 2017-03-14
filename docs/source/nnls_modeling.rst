@@ -223,7 +223,7 @@ the corresponding accessors. This information will be verified by the
 
       template <typename T>
       bool operator()(const T* const x , const T* const y, T* e) const {
-        e[0] = T(k_) - x[0] * y[0] - x[1] * y[1];
+        e[0] = k_ - x[0] * y[0] - x[1] * y[1];
         return true;
       }
 
@@ -281,13 +281,7 @@ the corresponding accessors. This information will be verified by the
    independent variables, and there is no limit on the dimensionality
    of each of them.
 
-   **WARNING 1** Since the functor will get instantiated with
-   different types for ``T``, you must convert from other numeric
-   types to ``T`` before mixing computations with other variables
-   of type ``T``. In the example above, this is seen where instead of
-   using ``k_`` directly, ``k_`` is wrapped with ``T(k_)``.
-
-   **WARNING 2** A common beginner's error when first using
+   **WARNING 1** A common beginner's error when first using
    :class:`AutoDiffCostFunction` is to get the sizing wrong. In particular,
    there is a tendency to set the template parameters to (dimension of
    residual, number of parameters) instead of passing a dimension
@@ -370,7 +364,7 @@ the corresponding accessors. This information will be verified by the
     NumericDiffOptions. Update DynamicNumericDiffOptions in a similar
     manner.
 
-    .. code-block:: c++
+  .. code-block:: c++
 
       template <typename CostFunctor,
                 NumericDiffMethodType method = CENTRAL,
@@ -389,15 +383,15 @@ the corresponding accessors. This information will be verified by the
       SizedCostFunction<kNumResiduals, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9> {
       };
 
-   To get a numerically differentiated :class:`CostFunction`, you must
-   define a class with a ``operator()`` (a functor) that computes the
-   residuals. The functor must write the computed value in the last
-   argument (the only non-``const`` one) and return ``true`` to
-   indicate success.  Please see :class:`CostFunction` for details on
-   how the return value may be used to impose simple constraints on
-   the parameter block. e.g., an object of the form
+  To get a numerically differentiated :class:`CostFunction`, you must
+  define a class with a ``operator()`` (a functor) that computes the
+  residuals. The functor must write the computed value in the last
+  argument (the only non-``const`` one) and return ``true`` to
+  indicate success.  Please see :class:`CostFunction` for details on
+  how the return value may be used to impose simple constraints on the
+  parameter block. e.g., an object of the form
 
-   .. code-block:: c++
+  .. code-block:: c++
 
      struct ScalarFunctor {
       public:
@@ -406,19 +400,19 @@ the corresponding accessors. This information will be verified by the
                        double* residuals) const;
      }
 
-   For example, consider a scalar error :math:`e = k - x'y`, where
-   both :math:`x` and :math:`y` are two-dimensional column vector
-   parameters, the prime sign indicates transposition, and :math:`k`
-   is a constant. The form of this error, which is the difference
-   between a constant and an expression, is a common pattern in least
-   squares problems. For example, the value :math:`x'y` might be the
-   model expectation for a series of measurements, where there is an
-   instance of the cost function for each measurement :math:`k`.
+  For example, consider a scalar error :math:`e = k - x'y`, where both
+  :math:`x` and :math:`y` are two-dimensional column vector
+  parameters, the prime sign indicates transposition, and :math:`k` is
+  a constant. The form of this error, which is the difference between
+  a constant and an expression, is a common pattern in least squares
+  problems. For example, the value :math:`x'y` might be the model
+  expectation for a series of measurements, where there is an instance
+  of the cost function for each measurement :math:`k`.
 
-   To write an numerically-differentiable class:`CostFunction` for the
-   above model, first define the object
+  To write an numerically-differentiable class:`CostFunction` for the
+  above model, first define the object
 
-   .. code-block::  c++
+  .. code-block::  c++
 
      class MyScalarCostFunctor {
        MyScalarCostFunctor(double k): k_(k) {}
@@ -434,39 +428,39 @@ the corresponding accessors. This information will be verified by the
        double k_;
      };
 
-   Note that in the declaration of ``operator()`` the input parameters
-   ``x`` and ``y`` come first, and are passed as const pointers to
-   arrays of ``double`` s. If there were three input parameters, then
-   the third input parameter would come after ``y``. The output is
-   always the last parameter, and is also a pointer to an array. In
-   the example above, the residual is a scalar, so only
-   ``residuals[0]`` is set.
+  Note that in the declaration of ``operator()`` the input parameters
+  ``x`` and ``y`` come first, and are passed as const pointers to
+  arrays of ``double`` s. If there were three input parameters, then
+  the third input parameter would come after ``y``. The output is
+  always the last parameter, and is also a pointer to an array. In the
+  example above, the residual is a scalar, so only ``residuals[0]`` is
+  set.
 
-   Then given this class definition, the numerically differentiated
-   :class:`CostFunction` with central differences used for computing
-   the derivative can be constructed as follows.
+  Then given this class definition, the numerically differentiated
+  :class:`CostFunction` with central differences used for computing
+  the derivative can be constructed as follows.
 
-   .. code-block:: c++
+  .. code-block:: c++
 
-     CostFunction* cost_function
-         = new NumericDiffCostFunction<MyScalarCostFunctor, CENTRAL, 1, 2, 2>(
-             new MyScalarCostFunctor(1.0));                    ^     ^  ^  ^
-                                                               |     |  |  |
-                                   Finite Differencing Scheme -+     |  |  |
-                                   Dimension of residual ------------+  |  |
-                                   Dimension of x ----------------------+  |
-                                   Dimension of y -------------------------+
+    CostFunction* cost_function
+        = new NumericDiffCostFunction<MyScalarCostFunctor, CENTRAL, 1, 2, 2>(
+            new MyScalarCostFunctor(1.0));                    ^     ^  ^  ^
+                                                              |     |  |  |
+                                  Finite Differencing Scheme -+     |  |  |
+                                  Dimension of residual ------------+  |  |
+                                  Dimension of x ----------------------+  |
+                                  Dimension of y -------------------------+
 
-   In this example, there is usually an instance for each measurement
-   of `k`.
+  In this example, there is usually an instance for each measurement
+  of `k`.
 
-   In the instantiation above, the template parameters following
-   ``MyScalarCostFunctor``, ``1, 2, 2``, describe the functor as
-   computing a 1-dimensional output from two arguments, both
-   2-dimensional.
+  In the instantiation above, the template parameters following
+  ``MyScalarCostFunctor``, ``1, 2, 2``, describe the functor as
+  computing a 1-dimensional output from two arguments, both
+  2-dimensional.
 
-   NumericDiffCostFunction also supports cost functions with a
-   runtime-determined number of residuals. For example:
+  NumericDiffCostFunction also supports cost functions with a
+  runtime-determined number of residuals. For example:
 
    .. code-block:: c++
 
@@ -483,42 +477,44 @@ the corresponding accessors. This information will be verified by the
                Dimension of y ---------------------------------------------------+
 
 
-   The framework can currently accommodate cost functions of up to 10
-   independent variables, and there is no limit on the dimensionality
-   of each of them.
+  The framework can currently accommodate cost functions of up to 10
+  independent variables, and there is no limit on the dimensionality
+  of each of them.
 
-   There are three available numeric differentiation schemes in ceres-solver:
+  There are three available numeric differentiation schemes in ceres-solver:
 
-   The ``FORWARD`` difference method, which approximates :math:`f'(x)`
-   by computing :math:`\frac{f(x+h)-f(x)}{h}`, computes the cost function
-   one additional time at :math:`x+h`. It is the fastest but least accurate
-   method.
+  The ``FORWARD`` difference method, which approximates :math:`f'(x)`
+  by computing :math:`\frac{f(x+h)-f(x)}{h}`, computes the cost
+  function one additional time at :math:`x+h`. It is the fastest but
+  least accurate method.
 
-   The ``CENTRAL`` difference method is more accurate at
-   the cost of twice as many function evaluations than forward
-   difference, estimating :math:`f'(x)` by computing
-   :math:`\frac{f(x+h)-f(x-h)}{2h}`.
+  The ``CENTRAL`` difference method is more accurate at the cost of
+  twice as many function evaluations than forward difference,
+  estimating :math:`f'(x)` by computing
+  :math:`\frac{f(x+h)-f(x-h)}{2h}`.
 
-   The ``RIDDERS`` difference method[Ridders]_ is an adaptive scheme that
-   estimates derivatives by performing multiple central differences
-   at varying scales. Specifically, the algorithm starts at a certain
-   :math:`h` and as the derivative is estimated, this step size decreases.
-   To conserve function evaluations and estimate the derivative error, the
-   method performs Richardson extrapolations between the tested step sizes.
-   The algorithm exhibits considerably higher accuracy, but does so by
-   additional evaluations of the cost function.
+  The ``RIDDERS`` difference method[Ridders]_ is an adaptive scheme
+  that estimates derivatives by performing multiple central
+  differences at varying scales. Specifically, the algorithm starts at
+  a certain :math:`h` and as the derivative is estimated, this step
+  size decreases.  To conserve function evaluations and estimate the
+  derivative error, the method performs Richardson extrapolations
+  between the tested step sizes.  The algorithm exhibits considerably
+  higher accuracy, but does so by additional evaluations of the cost
+  function.
 
-   Consider using ``CENTRAL`` differences to begin with. Based on the
-   results, either try forward difference to improve performance or
-   Ridders' method to improve accuracy.
+  Consider using ``CENTRAL`` differences to begin with. Based on the
+  results, either try forward difference to improve performance or
+  Ridders' method to improve accuracy.
 
-   **WARNING** A common beginner's error when first using
-   NumericDiffCostFunction is to get the sizing wrong. In particular,
-   there is a tendency to set the template parameters to (dimension of
-   residual, number of parameters) instead of passing a dimension
-   parameter for *every parameter*. In the example above, that would
-   be ``<MyScalarCostFunctor, 1, 2>``, which is missing the last ``2``
-   argument. Please be careful when setting the size parameters.
+  **WARNING** A common beginner's error when first using
+  :class:`NumericDiffCostFunction` is to get the sizing wrong. In
+  particular, there is a tendency to set the template parameters to
+  (dimension of residual, number of parameters) instead of passing a
+  dimension parameter for *every parameter*. In the example above,
+  that would be ``<MyScalarCostFunctor, 1, 2>``, which is missing the
+  last ``2`` argument. Please be careful when setting the size
+  parameters.
 
 
 Numeric Differentiation & LocalParameterization
@@ -919,7 +915,7 @@ Numeric Differentiation & LocalParameterization
            local_parameterizations, numeric_diff_options);
        GradientCheckResults results;
        if (!gradient_checker.Probe(parameter_blocks.data(), 1e-9, &results) {
-         LOG(ERROR) << "An error has occured:\n" << results.error_log;
+         LOG(ERROR) << "An error has occurred:\n" << results.error_log;
        }
 
 
@@ -1418,7 +1414,7 @@ Instances
               delta[0] * delta[0] + delta[1] * delta[1] + delta[2] * delta[2];
 
           T q_delta[4];
-          if (squared_norm_delta > T(0.0)) {
+          if (squared_norm_delta > 0.0) {
             T norm_delta = sqrt(squared_norm_delta);
             const T sin_delta_by_delta = sin(norm_delta) / norm_delta;
             q_delta[0] = cos(norm_delta);
@@ -1451,12 +1447,6 @@ Instances
                                                            |  |
                                 Global Size ---------------+  |
                                 Local Size -------------------+
-
-  **WARNING:** Since the functor will get instantiated with different
-  types for ``T``, you must to convert from other numeric types to
-  ``T`` before mixing computations with other variables of type
-  ``T``. In the example above, this is seen where instead of using
-  ``k_`` directly, ``k_`` is wrapped with ``T(k_)``.
 
 
 :class:`Problem`
