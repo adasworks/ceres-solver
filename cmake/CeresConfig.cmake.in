@@ -284,7 +284,7 @@ else (CERES_USES_MINIGLOG)
     # hints.
     set(GFLAGS_WAS_BUILT_WITH_CMAKE @FOUND_INSTALLED_GFLAGS_CMAKE_CONFIGURATION@)
     if (GFLAGS_WAS_BUILT_WITH_CMAKE)
-      set(gflags_DIR @gflags_DIR@)
+      #set(gflags_DIR @gflags_DIR@)
       set(GFLAGS_PREFER_EXPORTED_GFLAGS_CMAKE_CONFIGURATION TRUE)
     else()
       list(APPEND GFLAGS_INCLUDE_DIR_HINTS @GFLAGS_INCLUDE_DIR@)
@@ -293,7 +293,7 @@ else (CERES_USES_MINIGLOG)
     endif()
 
     # Search quietly s/t we control the timing of the error message if not found.
-    find_package(Gflags QUIET)
+    find_package(gflags QUIET CONFIG)
     if (GFLAGS_FOUND)
       message(STATUS "Found required Ceres dependency: gflags")
     else()
@@ -383,6 +383,14 @@ if (Ceres_FIND_COMPONENTS)
       "${CERES_DETECTED_VERSION_STRING}.")
   endif()
 endif()
+
+#if built with SuiteSparse, find SuiteSparse dependency
+include(CMakeFindDependencyMacro)
+if(@SUITESPARSE@ AND @SuiteSparse_FOUND@)
+    set(SuiteSparse_USE_LAPACK_BLAS ON)
+    find_dependency(SuiteSparse CONFIG)
+endif()
+
 
 # As we use CERES_REPORT_NOT_FOUND() to abort, if we reach this point we have
 # found Ceres and all required dependencies.

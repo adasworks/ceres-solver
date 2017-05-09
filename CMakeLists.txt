@@ -273,7 +273,6 @@ if (SUITESPARSE)
   # Check for SuiteSparse and dependencies.
   set(SuiteSparse_USE_LAPACK_BLAS ON)
   find_package(SuiteSparse REQUIRED CONFIG)
-  include(${USE_SuiteSparse})
   if (SuiteSparse_FOUND)
     # On Ubuntu the system install of SuiteSparse (v3.4.0) up to at least
     # Ubuntu 13.10 cannot be used to link shared libraries.
