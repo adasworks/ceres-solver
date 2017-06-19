@@ -129,18 +129,22 @@ list(APPEND CXSPARSE_CHECK_INCLUDE_DIRS
   /usr/local/homebrew/include # Mac OS X
   /opt/local/var/macports/software # Mac OS X.
   /opt/local/include
+  /usr/local/include/suitesparse # Linux.
+  /usr/include/suitesparse # Linux.
   /usr/include)
 list(APPEND CXSPARSE_CHECK_LIBRARY_DIRS
   /usr/local/lib
   /usr/local/homebrew/lib # Mac OS X.
   /opt/local/lib
+  /usr/local/lib/suitesparse # Linux.
+  /usr/lib/suitesparse # Linux.
   /usr/lib)
 
 # Search supplied hint directories first if supplied.
 find_path(CXSPARSE_INCLUDE_DIR
   NAMES cs.h
-  PATHS ${CXSPARSE_INCLUDE_DIR_HINTS}
-  ${CXSPARSE_CHECK_INCLUDE_DIRS})
+  HINTS ${CXSPARSE_INCLUDE_DIR_HINTS}
+  PATHS ${CXSPARSE_CHECK_INCLUDE_DIRS})
 if (NOT CXSPARSE_INCLUDE_DIR OR
     NOT EXISTS ${CXSPARSE_INCLUDE_DIR})
   cxsparse_report_not_found(
@@ -150,8 +154,8 @@ endif (NOT CXSPARSE_INCLUDE_DIR OR
        NOT EXISTS ${CXSPARSE_INCLUDE_DIR})
 
 find_library(CXSPARSE_LIBRARY NAMES cxsparse
-  PATHS ${CXSPARSE_LIBRARY_DIR_HINTS}
-  ${CXSPARSE_CHECK_LIBRARY_DIRS})
+  HINTS ${CXSPARSE_LIBRARY_DIR_HINTS}
+  PATHS ${CXSPARSE_CHECK_LIBRARY_DIRS})
 if (NOT CXSPARSE_LIBRARY OR
     NOT EXISTS ${CXSPARSE_LIBRARY})
   cxsparse_report_not_found(
