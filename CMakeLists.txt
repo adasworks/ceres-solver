@@ -203,7 +203,7 @@ endif (IOS)
 unset(CERES_COMPILE_OPTIONS)
 
 # Eigen.
-find_package(Eigen REQUIRED)
+find_package(Eigen REQUIRED CONFIG)
 if (EIGEN_FOUND)
   if (EIGEN_VERSION VERSION_LESS 3.1.0)
     message(FATAL_ERROR "-- Ceres requires Eigen version >= 3.1.0 in order "
@@ -869,7 +869,6 @@ install(FILES "${Ceres_BINARY_DIR}/CeresConfig-install.cmake"
         RENAME CeresConfig.cmake
         DESTINATION ${RELATIVE_CMAKECONFIG_INSTALL_DIR})
 install(FILES "${Ceres_BINARY_DIR}/CeresConfigVersion.cmake"
-              "${Ceres_SOURCE_DIR}/cmake/FindEigen.cmake"
               "${Ceres_SOURCE_DIR}/cmake/FindGlog.cmake"
               "${Ceres_SOURCE_DIR}/cmake/FindGflags.cmake"
         DESTINATION ${RELATIVE_CMAKECONFIG_INSTALL_DIR})
