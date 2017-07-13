@@ -234,7 +234,24 @@ else (BUILD_SHARED_LIBS)
   set(CERES_LIBRARY_DEPENDENCIES
         ${CERES_LIBRARY_PUBLIC_DEPENDENCIES}
         ${CERES_LIBRARY_PRIVATE_DEPENDENCIES})
-  target_link_libraries(ceres PUBLIC ${CERES_LIBRARY_DEPENDENCIES})
+  target_link_libraries(ceres PUBLIC ${CERES_LIBRARY_DEPENDENCIES} ${GFLAGS_LIBRARIES})
+  if (MSVC)
+    target_compile_options(ceres PRIVATE "/MP")
+  endif()
+  
+  target_include_directories(ceres
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/internal>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/internal/ceres>
+   )
+   if(MINIGLOG)
+        target_include_directories(ceres
+            PUBLIC
+            $<INSTALL_INTERFACE:include/ceres/internal/miniglog>
+        )
+   endif()
+  
   message(${CERES_LIBRARY_DEPENDENCIES})
 endif (BUILD_SHARED_LIBS)
 
