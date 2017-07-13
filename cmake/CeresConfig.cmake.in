@@ -383,7 +383,7 @@ endif()
 
 #if built with SuiteSparse, find SuiteSparse dependency
 include(CMakeFindDependencyMacro)
-if(@SUITESPARSE@ AND @SuiteSparse_FOUND@)
+if(@SUITESPARSE@)
     set(SuiteSparse_USE_LAPACK_BLAS ON)
     find_dependency(SuiteSparse CONFIG)
 endif()
