@@ -294,7 +294,7 @@ else (CERES_USES_MINIGLOG)
   #list(APPEND GLOG_LIBRARY_DIR_HINTS ${CERES_BUILD_GLOG_LIBRARY_DIR})
 
   # Search quietly s/t we control the timing of the error message if not found.
-  find_package(glog REQUIRED)
+  find_package(glog CONFIG REQUIRED)
   if (glog_FOUND)
     message(STATUS "Found required Ceres dependency: glog")
   else (glog_FOUND)
